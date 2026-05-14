@@ -5,27 +5,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.views import APIView
 
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BoardSerializer
+from ..models import Board
 
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-
-        return Response(
-            {
-                "message": "User created successfully",
-                "user": {
-                    "username": user.username,
-                    "email": user.email,
-                }
-            },
-            status=status.HTTP_201_CREATED
-        )
 
 
 class LoginView(generics.GenericAPIView):
@@ -36,19 +21,15 @@ class LoginView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.validated_data["user"]
+        token, _ = Token.objects.get_or_create(user=user)
 
-        token, created = Token.objects.get_or_create(user=user)
-
-        return Response(
-            {
-                "token": token.key,
-                "user": {
-                    "username": user.username,
-                    "email": user.email,
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+        return Response({
+            "token": token.key,
+            "user": {
+                "username": user.username,
+                "email": user.email,
+            }
+        })
 
 
 class MeView(APIView):
@@ -56,10 +37,37 @@ class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-
         return Response({
-            "id": user.id,
-            "username": user.username,
-            "email": user.email
+            "id": request.user.id,
+            "username": request.user.username,
+            "email": request.user.email
         })
+
+
+class BoardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        boards = Board.objects.filter(owner=request.user)
+        serializer = BoardSerializer(boards, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = BoardSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        board = serializer.save(owner=request.user)
+
+        return Response(BoardSerializer(board).data, status=201)
+
+
+class BoardDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            board = Board.objects.get(id=pk, owner=request.user)
+            board.delete()
+            return Response({"message": "Board deleted"})
+        except Board.DoesNotExist:
+            return Response({"error": "Not found"}, status=404)

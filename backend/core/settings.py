@@ -1,19 +1,17 @@
+from decouple import config
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-
-
-SECRET_KEY = 'django-insecure-hqm!j%65$d!$#uu0%5$%n=w!x*tm_-8xw^n(i6_l2m3+)$j@7)'
-
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
-# Application definition
-
+# -----------------------
+# SECURITY
+# -----------------------
+SECRET_KEY = config("SECRET_KEY")
+DEBUG = config("DEBUG", default="1", cast=bool)
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+# -----------------------
+# APPS
+# -----------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -21,23 +19,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     'rest_framework',
     'rest_framework.authtoken',
 
     'auth_app',
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ]
-}
-
+# -----------------------
+# MIDDLEWARE
+# -----------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -67,9 +58,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
-
-
+# -----------------------
+# DATABASE
+# -----------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -77,9 +68,9 @@ DATABASES = {
     }
 }
 
-
-
-
+# -----------------------
+# PASSWORD VALIDATION
+# -----------------------
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -95,18 +86,28 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-
-
+# -----------------------
+# INTERNATIONALIZATION
+# -----------------------
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-
-
+# -----------------------
+# STATIC FILES
+# -----------------------
 STATIC_URL = 'static/'
+
+# -----------------------
+# DRF CONFIG
+# -----------------------
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ]
+}

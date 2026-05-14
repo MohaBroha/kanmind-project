@@ -1,6 +1,9 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.views import APIView
 
 from .serializers import RegisterSerializer, LoginSerializer
 
@@ -46,3 +49,17 @@ class LoginView(generics.GenericAPIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+class MeView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "email": user.email
+        })

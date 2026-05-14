@@ -1,14 +1,19 @@
-# Backend
-backend/env/
-backend/__pycache__/
-backend/*.pyc
-backend/db.sqlite3
-backend/.env
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
+# Virtual Environment
+env/
+venv/
+.env
+
+# Database
+db.sqlite3
+
+# Django
+*.log
+local_settings.py
 
 # IDE
 .vscode/

@@ -101,23 +101,42 @@ class TaskView(APIView):
 class TaskDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, pk):
+    def get_object(self, pk, user):
+        return Task.objects.get(id=pk, board__owner=user)
 
+    def patch(self, request, pk):
         try:
-            task = Task.objects.get(
-                id=pk,
-                owner=request.user
+            task = self.get_object(pk, request.user)
+
+            serializer = TaskSerializer(
+                task,
+                data=request.data,
+                partial=True
             )
 
-            task.delete()
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
 
-            return Response({
-                "message": "Task deleted"
-            })
+            return Response(serializer.data)
 
         except Task.DoesNotExist:
-
             return Response(
                 {"error": "Task not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )      
+                status=404
+            )
+
+    def delete(self, request, pk):
+        try:
+            task = self.get_object(pk, request.user)
+            task.delete()
+
+            return Response(
+                {"message": "Task deleted"},
+                status=204
+            )
+
+        except Task.DoesNotExist:
+            return Response(
+                {"error": "Task not found"},
+                status=404
+            )

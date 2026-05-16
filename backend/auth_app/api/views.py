@@ -5,9 +5,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.views import APIView
 
-from .serializers import RegisterSerializer, LoginSerializer, BoardSerializer
-from ..models import Board
-
+from .serializers import (
+    RegisterSerializer,
+    LoginSerializer,
+    BoardSerializer,
+    TaskSerializer
+)
+from ..models import Board, Task
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -71,3 +75,49 @@ class BoardDetailView(APIView):
             return Response({"message": "Board deleted"})
         except Board.DoesNotExist:
             return Response({"error": "Not found"}, status=404)
+
+
+class TaskView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tasks = Task.objects.filter(owner=request.user)
+        serializer = TaskSerializer(tasks, many=True)
+
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = TaskSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        task = serializer.save(owner=request.user)
+
+        return Response(
+            TaskSerializer(task).data,
+            status=status.HTTP_201_CREATED
+        )
+
+
+class TaskDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+
+        try:
+            task = Task.objects.get(
+                id=pk,
+                owner=request.user
+            )
+
+            task.delete()
+
+            return Response({
+                "message": "Task deleted"
+            })
+
+        except Task.DoesNotExist:
+
+            return Response(
+                {"error": "Task not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )      

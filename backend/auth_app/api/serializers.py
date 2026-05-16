@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from ..models import Board, Task
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -30,15 +31,7 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
-class BoardSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Board
-        fields = ["id", "title", "created_at"]
-        read_only_fields = ["id", "created_at"]
-
-
 class TaskSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Task
         fields = [
@@ -49,5 +42,13 @@ class TaskSerializer(serializers.ModelSerializer):
             "board",
             "created_at",
         ]
-
         read_only_fields = ["id", "created_at"]
+
+
+class BoardSerializer(serializers.ModelSerializer):
+    tasks = TaskSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Board
+        fields = ["id", "title", "created_at", "tasks"]
+        read_only_fields = ["id", "created_at", "tasks"]

@@ -51,47 +51,38 @@ class MeView(APIView):
 class BoardView(APIView):
     permission_classes = [IsAuthenticated]
 
-  def get(self, request):
-    boards = Board.objects.filter(owner=request.user)
-    serializer = BoardSerializer(boards, many=True)
-    return Response({
-        "success": True,
-        "data": serializer.data
-    })
+    def get(self, request):
+        boards = Board.objects.filter(owner=request.user)
+        serializer = BoardSerializer(boards, many=True)
+        return Response(serializer.data)
 
-def post(self, request):
-    serializer = BoardSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-
-    board = serializer.save(owner=request.user)
-
-    return Response({
-        "success": True,
-        "data": BoardSerializer(board).data
-    }, status=201)
+    def post(self, request):
+        serializer = BoardSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(owner=request.user)
+        return Response(serializer.data, status=201)
 
 class BoardDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def get_object(self, pk, user):
+        return Board.objects.get(id=pk, owner=user)
+
     def delete(self, request, pk):
         try:
-            board = Board.objects.get(
-                id=pk,
-                owner=request.user
-            )
-
+            board = self.get_object(pk, request.user)
             board.delete()
 
-            return Response(
-                {"message": "Board deleted"}, 
-                status=200)
+            return Response({
+                "success": True,
+                "message": "Board deleted"
+            }, status=200)
 
         except Board.DoesNotExist:
-            return Response(
-                {"error": "Board not found"},
-                status=404
-            )
-
+            return Response({
+                "success": False,
+                "error": "Board not found"
+            }, status=404)
 
 class TaskView(APIView):
     permission_classes = [IsAuthenticated]
@@ -100,9 +91,7 @@ class TaskView(APIView):
 
         status_param = request.query_params.get("status")
 
-        tasks = Task.objects.filter(
-            board__owner=request.user
-        )
+        tasks = Task.objects.filter(board__owner=request.user)
 
         if status_param:
             tasks = tasks.filter(status=status_param)
@@ -114,6 +103,14 @@ class TaskView(APIView):
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        board_id = request.data.get("board")
+
+        if not Board.objects.filter(id=board_id, owner=request.user).exists():
+            return Response(
+                {"error": "Invalid board"},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         task = serializer.save(owner=request.user)
 

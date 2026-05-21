@@ -32,6 +32,32 @@ class LoginSerializer(serializers.Serializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+
+    def validate_status(self, value):
+        # Wenn Task neu erstellt wird → keine Transition prüfen
+        if not self.instance:
+            return value
+
+        old_status = self.instance.status
+
+        allowed_transitions = {
+            "todo": ["doing"],
+            "doing": ["done", "todo"],
+            "done": ["doing"],
+        }
+
+        # Wenn kein Wechsel passiert
+        if value == old_status:
+            return value
+
+        # Prüfen ob Transition erlaubt ist
+        if value not in allowed_transitions.get(old_status, []):
+            raise serializers.ValidationError(
+                f"Invalid status transition: {old_status} → {value}"
+            )
+
+        return value
+
     class Meta:
         model = Task
         fields = [

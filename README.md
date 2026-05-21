@@ -61,7 +61,7 @@ GET /api/auth/me/
 ---
 
 ## 📁 Project Structure
-
+```
 KanMind-Project/
 │
 ├── backend/
@@ -89,7 +89,7 @@ KanMind-Project/
 ├── .gitignore
 ├── README.md
 
----
+```
 
 ## ⚙️ Setup (Local Development)
 

@@ -81,7 +81,16 @@ class TaskView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        tasks = Task.objects.filter(owner=request.user)
+
+        status_param = request.query_params.get("status")
+
+        tasks = Task.objects.filter(
+            board__owner=request.user
+        )
+
+        if status_param:
+            tasks = tasks.filter(status=status_param)
+
         serializer = TaskSerializer(tasks, many=True)
 
         return Response(serializer.data)
@@ -96,7 +105,6 @@ class TaskView(APIView):
             TaskSerializer(task).data,
             status=status.HTTP_201_CREATED
         )
-
 
 class TaskDetailView(APIView):
     permission_classes = [IsAuthenticated]

@@ -9,6 +9,10 @@ class Board(models.Model):
         on_delete=models.CASCADE,
         related_name="boards"
     )
+    members = models.ManyToManyField(
+        User,
+        related_name='member_boards'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

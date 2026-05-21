@@ -9,6 +9,7 @@ from .serializers import (
     RegisterSerializer,
     LoginSerializer,
     BoardSerializer,
+    BoardDetailSerializer,
     TaskSerializer
 )
 from ..models import Board, Task
@@ -63,26 +64,50 @@ class BoardView(APIView):
         return Response(serializer.data, status=201)
 
 class BoardDetailView(APIView):
+
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, pk, user):
-        return Board.objects.get(id=pk, owner=user)
+    def get_object(self, pk):
 
-    def delete(self, request, pk):
         try:
-            board = self.get_object(pk, request.user)
-            board.delete()
-
-            return Response({
-                "success": True,
-                "message": "Board deleted"
-            }, status=200)
+            return Board.objects.get(id=pk)
 
         except Board.DoesNotExist:
-            return Response({
-                "success": False,
-                "error": "Board not found"
-            }, status=404)
+            return None
+
+    def get(self, request, pk):
+
+        board = self.get_object(pk)
+
+        if not board:
+            return Response(
+                {"error": "Board not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = BoardDetailSerializer(board)
+
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+
+        board = self.get_object(pk)
+
+        if not board:
+            return Response(
+                {"error": "Board not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if board.owner != request.user:
+            return Response(
+                {"error": "Only owner can delete board"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        board.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class TaskView(APIView):
     permission_classes = [IsAuthenticated]

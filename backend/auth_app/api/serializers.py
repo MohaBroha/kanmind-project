@@ -29,7 +29,17 @@ class LoginSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
+class UserSerializer(serializers.ModelSerializer):
 
+    fullname = serializers.CharField(source="username")
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "fullname",
+        ]
 
 class TaskSerializer(serializers.ModelSerializer):
 
@@ -102,3 +112,21 @@ class BoardSerializer(serializers.ModelSerializer):
 
     def get_tasks_high_prio_count(self, obj):
         return Task.objects.filter(board=obj, priority="high").count()
+
+class BoardDetailSerializer(serializers.ModelSerializer):
+
+    owner_id = serializers.IntegerField(source="owner.id", read_only=True)
+
+    members = UserSerializer(many=True, read_only=True)
+
+    tasks = TaskSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Board
+        fields = [
+            "id",
+            "title",
+            "owner_id",
+            "members",
+            "tasks",
+        ]

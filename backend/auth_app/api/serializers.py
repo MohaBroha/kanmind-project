@@ -65,6 +65,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "status",
+            "priority",
             "board",
             "created_at",
         ]
@@ -72,9 +73,32 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
-    tasks = TaskSerializer(many=True, read_only=True)
+    member_count = serializers.SerializerMethodField()
+    ticket_count = serializers.SerializerMethodField()
+    tasks_to_do_count = serializers.SerializerMethodField()
+    tasks_high_prio_count = serializers.SerializerMethodField()
+    owner_id = serializers.IntegerField(source="owner.id", read_only=True)
 
     class Meta:
         model = Board
-        fields = ["id", "title", "created_at", "tasks"]
-        read_only_fields = ["id", "created_at", "tasks"]
+        fields = [
+            "id",
+            "title",
+            "member_count",
+            "ticket_count",
+            "tasks_to_do_count",
+            "tasks_high_prio_count",
+            "owner_id",
+        ]
+
+    def get_member_count(self, obj):
+        return obj.members.count() if hasattr(obj, "members") else 0
+
+    def get_ticket_count(self, obj):
+        return Task.objects.filter(board=obj).count()
+
+    def get_tasks_to_do_count(self, obj):
+        return Task.objects.filter(board=obj, status="todo").count()
+
+    def get_tasks_high_prio_count(self, obj):
+        return Task.objects.filter(board=obj, priority="high").count()

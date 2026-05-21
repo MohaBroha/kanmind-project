@@ -32,6 +32,16 @@ class Task(models.Model):
         default="todo"
     )
 
+    priority = models.CharField(
+    max_length=10,
+    choices=[
+        ("low", "low"),
+        ("medium", "medium"),
+        ("high", "high"),
+    ],
+    default="medium",
+    )
+
     board = models.ForeignKey(
         Board,
         on_delete=models.CASCADE,

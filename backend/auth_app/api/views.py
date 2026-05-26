@@ -4,6 +4,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.views import APIView
+from django.db.models import Q
+from django.contrib.auth.models import User
 
 from .serializers import (
     RegisterSerializer,
@@ -63,21 +65,25 @@ class BoardView(APIView):
         serializer.save(owner=request.user)
         return Response(serializer.data, status=201)
 
+
 class BoardDetailView(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, pk):
-
+    def get_object(self, pk, user):
         try:
-            return Board.objects.get(id=pk)
-
+            return Board.objects.get(
+                Q(id=pk) & (Q(owner=user) | Q(members=user))
+            )
         except Board.DoesNotExist:
             return None
 
+    # -------------------
+    # GET BOARD DETAIL
+    # -------------------
     def get(self, request, pk):
 
-        board = self.get_object(pk)
+        board = self.get_object(pk, request.user)
 
         if not board:
             return Response(
@@ -86,12 +92,14 @@ class BoardDetailView(APIView):
             )
 
         serializer = BoardDetailSerializer(board)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response(serializer.data)
+    # -------------------
+    # PATCH BOARD (title + members)
+    # -------------------
+    def patch(self, request, pk):
 
-    def delete(self, request, pk):
-
-        board = self.get_object(pk)
+        board = self.get_object(pk, request.user)
 
         if not board:
             return Response(
@@ -99,6 +107,63 @@ class BoardDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        # OWNER ONLY
+        if request.user != board.owner:
+            return Response(
+                {"error": "Only owner can update board"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        data = request.data
+
+        # TITLE (optional)
+        if "title" in data:
+            board.title = data["title"]
+
+        # MEMBERS (optional)
+        if "members" in data:
+            member_ids = data["members"]
+
+            users = User.objects.filter(id__in=member_ids)
+
+            if len(users) != len(member_ids):
+                return Response(
+                    {"error": "One or more users not found"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            board.members.set(users)
+
+        board.save()
+
+        return Response({
+            "id": board.id,
+            "title": board.title,
+            "owner_id": board.owner.id,
+            "members": [
+                {
+                    "id": u.id,
+                    "email": u.email,
+                    "username": u.username
+                }
+                for u in board.members.all()
+            ]
+        }, status=status.HTTP_200_OK)
+
+    # -------------------
+    # DELETE BOARD
+    # -------------------
+    def delete(self, request, pk):
+
+        board = self.get_object(pk, request.user)
+
+        if not board:
+            return Response(
+                {"error": "Board not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # nur OWNER darf löschen
         if board.owner != request.user:
             return Response(
                 {"error": "Only owner can delete board"},
@@ -108,6 +173,7 @@ class BoardDetailView(APIView):
         board.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class TaskView(APIView):
     permission_classes = [IsAuthenticated]
@@ -143,6 +209,7 @@ class TaskView(APIView):
             TaskSerializer(task).data,
             status=status.HTTP_201_CREATED
         )
+
 
 class TaskDetailView(APIView):
     permission_classes = [IsAuthenticated]

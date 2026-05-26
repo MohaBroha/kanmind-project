@@ -3,15 +3,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# -----------------------
-# SECURITY
-# -----------------------
+
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default="1", cast=bool)
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-# -----------------------
-# APPS
-# -----------------------
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -26,9 +22,7 @@ INSTALLED_APPS = [
     'auth_app',
 ]
 
-# -----------------------
-# MIDDLEWARE
-# -----------------------
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -58,9 +52,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# -----------------------
-# DATABASE
-# -----------------------
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -68,9 +60,7 @@ DATABASES = {
     }
 }
 
-# -----------------------
-# PASSWORD VALIDATION
-# -----------------------
+-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -86,22 +76,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# -----------------------
-# INTERNATIONALIZATION
-# -----------------------
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# -----------------------
-# STATIC FILES
-# -----------------------
+
 STATIC_URL = 'static/'
 
-# -----------------------
-# DRF CONFIG
-# -----------------------
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',

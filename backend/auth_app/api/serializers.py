@@ -44,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
 
     def validate_status(self, value):
-        # Wenn Task neu erstellt wird → keine Transition prüfen
+        
         if not self.instance:
             return value
 
@@ -56,11 +56,10 @@ class TaskSerializer(serializers.ModelSerializer):
             "done": ["doing"],
         }
 
-        # Wenn kein Wechsel passiert
+        
         if value == old_status:
             return value
 
-        # Prüfen ob Transition erlaubt ist
         if value not in allowed_transitions.get(old_status, []):
             raise serializers.ValidationError(
                 f"Invalid status transition: {old_status} → {value}"

@@ -78,9 +78,7 @@ class BoardDetailView(APIView):
         except Board.DoesNotExist:
             return None
 
-    # -------------------
-    # GET BOARD DETAIL
-    # -------------------
+    
     def get(self, request, pk):
 
         board = self.get_object(pk, request.user)
@@ -94,9 +92,7 @@ class BoardDetailView(APIView):
         serializer = BoardDetailSerializer(board)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # -------------------
-    # PATCH BOARD (title + members)
-    # -------------------
+    
     def patch(self, request, pk):
 
         board = self.get_object(pk, request.user)
@@ -107,7 +103,7 @@ class BoardDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # OWNER ONLY
+        
         if request.user != board.owner:
             return Response(
                 {"error": "Only owner can update board"},
@@ -116,11 +112,11 @@ class BoardDetailView(APIView):
 
         data = request.data
 
-        # TITLE (optional)
+        
         if "title" in data:
             board.title = data["title"]
 
-        # MEMBERS (optional)
+        
         if "members" in data:
             member_ids = data["members"]
 
@@ -150,9 +146,7 @@ class BoardDetailView(APIView):
             ]
         }, status=status.HTTP_200_OK)
 
-    # -------------------
-    # DELETE BOARD
-    # -------------------
+    
     def delete(self, request, pk):
 
         board = self.get_object(pk, request.user)
@@ -163,7 +157,7 @@ class BoardDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # nur OWNER darf löschen
+        
         if board.owner != request.user:
             return Response(
                 {"error": "Only owner can delete board"},

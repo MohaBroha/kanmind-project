@@ -88,17 +88,17 @@ Authorization: Token <your_token>
 
 ## Tested Contract Status
 
-✔ User registration works
-✔ Login works (token authentication)
-✔ Me endpoint works
-✔ Create board works
-✔ Get board list works
-✔ Get board detail works
-✔ PATCH title works
-✔ PATCH members works
-✔ Owner-only update enforced
-✔ Invalid board returns 404
-✔ Unauthorized access blocked
+- ✔ User registration works
+- ✔ Login works (token authentication)
+- ✔ Me endpoint works
+- ✔ Create board works
+- ✔ Get board list works
+- ✔ Get board detail works
+- ✔ PATCH title works
+- ✔ PATCH members works
+- ✔ Owner-only update enforced
+- ✔ Invalid board returns 404
+- ✔ Unauthorized access blocked
 
 
 ## Project Structure
@@ -251,19 +251,19 @@ Step 7: Board API Contract completed
 Step 7.5: Board API completed
 
 
-Validation Logic
+### Validation Logic
 
 The authentication and board validation logic has been successfully tested and confirmed working.
 
-✔ User registration validates required fields correctly
-✔ Login validates credentials and returns valid token
-✔ Token authentication correctly protects endpoints
-✔ /api/auth/me/ only accessible with valid token
-✔ Board creation validates required title field
-✔ Board update validates ownership permissions
-✔ Board membership updates correctly replace user list
-✔ Invalid board IDs return proper 404 response
-✔ Unauthorized requests are blocked with 401 response
+- ✔ User registration validates required fields correctly
+- ✔ Login validates credentials and returns valid token
+- ✔ Token authentication correctly protects endpoints
+- ✔ /api/auth/me/ only accessible with valid token
+- ✔ Board creation validates required title field
+- ✔ Board update validates ownership permissions
+- ✔ Board membership updates correctly replace user list
+- ✔ Invalid board IDs return proper 404 response
+- ✔ Unauthorized requests are blocked with 401 response
 
 
 ---

@@ -86,7 +86,7 @@ Example request:
 All requests require:
 Authorization: Token <your_token>
 
-Tested Contract Status
+## Tested Contract Status
 
 ✔ User registration works
 ✔ Login works (token authentication)

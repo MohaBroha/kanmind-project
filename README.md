@@ -101,9 +101,9 @@ Tested Contract Status
 ✔ Unauthorized access blocked
 
 
-Project Structure
-´´´
+## Project Structure
 
+```
 KanMind-Project/
 ├── backend/
 │   ├── core/
@@ -122,7 +122,7 @@ KanMind-Project/
 ├── README.md
 ```
 
-´´´
+
 
 Architecture / ER Diagrams
 

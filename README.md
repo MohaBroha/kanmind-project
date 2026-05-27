@@ -236,7 +236,7 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 
-# ⚙️ Local Setup & Installation
+### Local Setup & Installation
 
 Follow these steps to run the KanMind backend locally.
 

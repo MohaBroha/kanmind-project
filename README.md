@@ -321,7 +321,7 @@ python manage.py runserver
 
 ---
 
-# 🚀 Server Running
+### Server Running
 
 Backend is now available at:
 
@@ -331,7 +331,7 @@ http://127.0.0.1:8000/
 
 ---
 
-# 🔐 Example Login Request
+### Example Login Request
 
 ```powershell
 Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/auth/login/" `
@@ -342,7 +342,7 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/auth/login/" `
 
 ---
 
-# 📡 Example Protected Request
+### Example Protected Request
 
 ```powershell
 Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/auth/me/" `

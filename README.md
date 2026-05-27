@@ -100,22 +100,27 @@ Tested Contract Status
 ✔ Invalid board returns 404
 ✔ Unauthorized access blocked
 
+
 Project Structure
 ´´´
+
 KanMind-Project/
 ├── backend/
 │   ├── core/
 │   ├── auth_app/
+│   ├── docs/
+│   │   ├── er-target.png
+│   │   ├── er-current.png
 │   ├── manage.py
+│
 ├── frontend/
 │   ├── pages/
 │   ├── shared/
 │   ├── assets/
-├── docs/
-│   ├── er-target.png
-│   ├── er-current.png
+│
 ├── .gitignore
 ├── README.md
+```
 
 ´´´
 
@@ -187,7 +192,7 @@ Relationships:
 
 Target ER Diagram
 
-![Target ER Diagram](./docs/er-target.png)
+![Target ER Diagram](./backend/docs/er-target.png)
 
 2. Current State ER Diagram
 
@@ -221,7 +226,7 @@ Relationships:
 
 Current ER Diagram
 
-![Current ER Diagram](./docs/er-current.png)
+![Current ER Diagram](./backend/docs/er-current.png)
 
 Notes
 

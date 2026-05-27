@@ -126,9 +126,9 @@ KanMind-Project/
 
 Architecture / ER Diagrams
 
-1. Target Architecture ER Diagram
+### 1. Target Architecture ER Diagram
 
-User
+## User
   PK id
   username
   email
@@ -136,14 +136,14 @@ User
   created_at
   updated_at
 
-Board
+## Board
   PK id
   title
   owner_id -> User.id
   created_at
   updated_at
 
-Column
+## Column
   PK id
   title
   board_id -> Board.id
@@ -151,7 +151,7 @@ Column
   created_at
   updated_at
 
-Task
+## Task
   PK id
   title
   description
@@ -163,24 +163,24 @@ Task
   created_at
   updated_at
 
-Comment
+## Comment
   PK id
   body
   task_id -> Task.id
   author_id -> User.id
   created_at
 
-Label
+## Label
   PK id
   name
   color
   board_id -> Board.id
 
-TaskLabel
+## TaskLabel
   task_id -> Task.id
   label_id -> Label.id
 
-Relationships:
+## Relationships:
 - User 1..* owns -> Board
 - User 1..* owns -> Task
 - User 1..* authors -> Comment
@@ -194,21 +194,20 @@ Target ER Diagram
 
 ![Target ER Diagram](./backend/docs/er-target.png)
 
-2. Current State ER Diagram
-
-User
+### 2. Current State ER Diagram
+## User
   PK id
   username
   email
   password
 
-Board
+## Board
   PK id
   title
   owner_id -> User.id
   created_at
 
-Task
+## Task
   PK id
   title
   description
@@ -218,7 +217,7 @@ Task
   owner_id -> User.id
   created_at
 
-Relationships:
+## Relationships:
 - User 1..* owns -> Board
 - Board *..* members -> User
 - Board 1..* has -> Task
@@ -244,11 +243,119 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 
-Project Status
+# ⚙️ Local Setup & Installation
 
-Step 6: Authentication System completed
-Step 7: Board API Contract completed
-Step 7.5: Board API completed
+Follow these steps to run the KanMind backend locally.
+
+---
+
+## 1️⃣ Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/KanMind-Project.git
+```
+
+---
+
+## 2️⃣ Navigate Into Project
+
+```bash
+cd KanMind-Project
+```
+
+---
+
+## 3️⃣ Navigate Into Backend
+
+```bash
+cd backend
+```
+
+---
+
+## 4️⃣ Create Virtual Environment
+
+### Windows
+```bash
+python -m venv env
+```
+
+---
+
+## 5️⃣ Activate Virtual Environment
+
+### Windows PowerShell
+```powershell
+./env/scripts/activate
+```
+
+### Windows CMD
+```cmd
+env\Scripts\activate
+```
+
+---
+
+## 6️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 7️⃣ Apply Database Migrations
+
+```bash
+python manage.py migrate
+```
+
+---
+
+## 8️⃣ Create Superuser (Optional)
+
+```bash
+python manage.py createsuperuser
+```
+
+---
+
+## 9️⃣ Start Development Server
+
+```bash
+python manage.py runserver
+```
+
+---
+
+# 🚀 Server Running
+
+Backend is now available at:
+
+```txt
+http://127.0.0.1:8000/
+```
+
+---
+
+# 🔐 Example Login Request
+
+```powershell
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/auth/login/" `
+-Method POST `
+-Body '{"username":"YOUR_USERNAME","password":"YOUR_PASSWORD"}' `
+-ContentType "application/json"
+```
+
+---
+
+# 📡 Example Protected Request
+
+```powershell
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/auth/me/" `
+-Headers @{Authorization="Token YOUR_TOKEN"} `
+-Method GET
+```
 
 
 ### Validation Logic

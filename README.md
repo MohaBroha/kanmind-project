@@ -71,13 +71,13 @@ API Endpoints (Auth)
 
 Board API (Kanban Core Module)
 
-Permissions
+## Permissions
 
 - Only authenticated users can access boards
 - Only the board owner can update or delete a board
 - Board members can view the board but cannot modify it
 
-Board Endpoints
+## Board Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -87,7 +87,7 @@ Board Endpoints
 | /api/auth/boards/<id>/ | PATCH | Update board (title + members) |
 | /api/auth/boards/<id>/ | DELETE | Delete board (owner only) |
 
-PATCH Behavior
+## PATCH Behavior
 
 - title → optional update
 - members → replaces full list
@@ -134,7 +134,7 @@ KanMind-Project/
 
 
 
-Architecture / ER Diagrams
+## Architecture / ER Diagrams
 
 ### 1. Target Architecture ER Diagram
 
@@ -244,7 +244,7 @@ Current ER Diagram
 - Task.owner is one-to-many
 - Task.board is one-to-many
 
-Setup (Local Development)
+## Setup (Local Development)
 
 cd backend
 python -m venv env
@@ -253,7 +253,7 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 
-### Local Setup & Installation
+## Local Setup & Installation
 
 Follow these steps to run the KanMind backend locally.
 

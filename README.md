@@ -2,6 +2,27 @@ KanMind 🧠
 
 ### KanMind is a Django REST API backend for a Kanban-style productivity application.
 
+
+### Table of Contents
+Features
+Tech Stack
+Authentication Flow
+API Endpoints (Auth)
+Board API (Kanban Core Module)
+Permissions
+Board Endpoints
+PATCH Behavior
+Tested Contract Status
+Project Structure
+Architecture / ER Diagrams
+Target Architecture ER Diagram
+Current State ER Diagram
+Notes
+Setup (Local Development)
+Local Setup & Installation
+Validation Logic
+Author
+
 ### Features
 
 - User Registration API

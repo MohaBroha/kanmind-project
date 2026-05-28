@@ -4,26 +4,27 @@ KanMind 🧠
 
 
 ### Table of Contents
-Features
-Tech Stack
-Authentication Flow
-API Endpoints (Auth)
-Board API (Kanban Core Module)
-Permissions
-Board Endpoints
-PATCH Behavior
-Tested Contract Status
-Project Structure
-Architecture / ER Diagrams
-Target Architecture ER Diagram
-Current State ER Diagram
-Notes
-Setup (Local Development)
-Local Setup & Installation
-Validation Logic
-Author
 
-### Features
+- Features
+- Tech Stack
+- Authentication Flow
+- API Endpoints (Auth)
+- Board API (Kanban Core Module)
+- Permissions
+- Board Endpoints
+- PATCH Behavior
+- Tested Contract Status
+- Project Structure
+- Architecture / ER Diagrams
+- Target Architecture ER Diagram
+- Current State ER Diagram
+- Notes
+- Setup (Local Development)
+- Local Setup & Installation
+- Validation Logic
+- Author
+
+## Features
 
 - User Registration API
 - User Login with Token Authentication
@@ -35,7 +36,7 @@ Author
 - Clean modular backend structure
 - Git-clean project setup with proper .gitignore
 
-Tech Stack
+## Tech Stack
 
 Backend
 - Python 3.14
@@ -43,12 +44,7 @@ Backend
 - Django REST Framework
 - Token Authentication (DRF)
 
-Frontend
-- HTML5
-- CSS3
-- JavaScript (Vanilla)
-
-Authentication Flow
+## Authentication Flow
 
 1. Register user:
 POST /api/auth/register/
@@ -241,7 +237,7 @@ Current ER Diagram
 
 ![Current ER Diagram](./backend/docs/er-current.png)
 
-Notes
+## Notes
 
 - Board.members is many-to-many
 - Board.owner is one-to-many
@@ -372,7 +368,7 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/auth/me/" `
 ```
 
 
-### Validation Logic
+## Validation Logic
 
 The authentication and board validation logic has been successfully tested and confirmed working.
 
@@ -389,7 +385,7 @@ The authentication and board validation logic has been successfully tested and c
 
 ---
 
-Author
+## Author
 
 - Name: Moha Broha
 - Role: Fullstack Developer (trainee)

@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from ..models import Board, Task, Comment
+from auth_app.models import Board, Task, Comment
 
 
 class RegisterSerializer(serializers.Serializer):
-    fullname = serializers.CharField()
+    fullname = serializers.CharField(write_only=True)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
     repeated_password = serializers.CharField(write_only=True, required=True)
@@ -21,17 +21,28 @@ class RegisterSerializer(serializers.Serializer):
         validated_data.pop("repeated_password")
         fullname = validated_data.pop("fullname")
         username = fullname.replace(" ", "_").strip() or "user"
-        # Ensure unique username
         base_username = username
         counter = 1
         while User.objects.filter(username=username).exists():
             username = f"{base_username}_{counter}"
             counter += 1
-        return User.objects.create_user(
+        user = User.objects.create_user(
             username=username,
             email=validated_data["email"],
             password=validated_data["password"]
         )
+        from rest_framework.authtoken.models import Token
+        token, _ = Token.objects.get_or_create(user=user)
+        user._generated_token = token.key
+        return user
+
+    def to_representation(self, instance):
+        return {
+            "token": instance._generated_token,
+            "fullname": instance.username,
+            "email": instance.email,
+            "user_id": instance.id,
+        }
 
 
 class LoginSerializer(serializers.Serializer):
@@ -42,9 +53,9 @@ class LoginSerializer(serializers.Serializer):
         email = attrs.get("email")
         password = attrs.get("password")
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
+        user = User.objects.filter(email=email).first()
+
+        if user is None:
             raise serializers.ValidationError("Invalid email or password")
 
         user = authenticate(username=user.username, password=password)

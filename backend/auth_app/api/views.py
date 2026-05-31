@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from .serializers import (
     RegisterSerializer,
     LoginSerializer,
-    BoardSerializer,
+    BoardListSerializer,
     BoardDetailSerializer,
     TaskSerializer
 )
@@ -56,11 +56,11 @@ class BoardView(APIView):
 
     def get(self, request):
         boards = Board.objects.filter(owner=request.user)
-        serializer = BoardSerializer(boards, many=True)
+        serializer = BoardListSerializer(boards, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = BoardSerializer(data=request.data)
+        serializer = BoardListSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(owner=request.user)
         return Response(serializer.data, status=201)

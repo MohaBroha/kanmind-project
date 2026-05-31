@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from .serializers import (
     RegisterSerializer,
     LoginSerializer,
-    BoardListSerializer,
+    BoardSerializer,
     BoardDetailSerializer,
     TaskSerializer
 )
@@ -51,19 +51,13 @@ class MeView(APIView):
         })
 
 
-class BoardView(APIView):
+class BoardView(generics.ListCreateAPIView):
+    queryset = Board.objects.all()
+    serializer_class = BoardSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        boards = Board.objects.filter(owner=request.user)
-        serializer = BoardListSerializer(boards, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = BoardListSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(owner=request.user)
-        return Response(serializer.data, status=201)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class BoardDetailView(APIView):

@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from auth_app.models import Board, Task, Comment
+from auth_app.models import Board, Task
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -80,13 +80,16 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
+class BoardSerializer(serializers.ModelSerializer):
+    owner_id = serializers.IntegerField(source="owner.id", read_only=True)
 
     class Meta:
-        model = Comment
-        fields = ["id", "author", "content", "created_at"]
-        read_only_fields = ["id", "author", "created_at"]
+        model = Board
+        fields = [
+            "id",
+            "title",
+            "owner_id",
+        ]
 
 
 class TaskSerializer(serializers.ModelSerializer):

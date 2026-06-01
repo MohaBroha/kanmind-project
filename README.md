@@ -259,7 +259,7 @@ Follow these steps to run the KanMind backend locally.
 
 ---
 
-## 1️⃣ Clone Repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/KanMind-Project.git
@@ -267,7 +267,7 @@ git clone https://github.com/YOUR_USERNAME/KanMind-Project.git
 
 ---
 
-## 2️⃣ Navigate Into Project
+## Navigate Into Project
 
 ```bash
 cd KanMind-Project
@@ -275,7 +275,7 @@ cd KanMind-Project
 
 ---
 
-## 3️⃣ Navigate Into Backend
+## Navigate Into Backend
 
 ```bash
 cd backend
@@ -283,7 +283,7 @@ cd backend
 
 ---
 
-## 4️⃣ Create Virtual Environment
+## Create Virtual Environment
 
 ### Windows
 ```bash
@@ -292,7 +292,7 @@ python -m venv env
 
 ---
 
-## 5️⃣ Activate Virtual Environment
+## Activate Virtual Environment
 
 ### Windows PowerShell
 ```powershell
@@ -306,15 +306,17 @@ env\Scripts\activate
 
 ---
 
-## 6️⃣ Install Dependencies
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
+## Environment Setup (.env)
 
----
-
-## 7️⃣ Apply Database Migrations
+```bash
+Create .env file
+```
+## Apply Database Migrations
 
 ```bash
 python manage.py migrate
@@ -322,7 +324,7 @@ python manage.py migrate
 
 ---
 
-## 8️⃣ Create Superuser (Optional)
+## Create Superuser (Optional)
 
 ```bash
 python manage.py createsuperuser
@@ -330,7 +332,7 @@ python manage.py createsuperuser
 
 ---
 
-## 9️⃣ Start Development Server
+## Start Development Server
 
 ```bash
 python manage.py runserver

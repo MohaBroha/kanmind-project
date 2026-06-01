@@ -311,7 +311,10 @@ env\Scripts\activate
 ```bash
 pip install -r requirements.txt
 ```
+## Environment Setup (.env)
 
+´´´´
+📁  Create .env file
 ---
 
 ## 7️⃣ Apply Database Migrations

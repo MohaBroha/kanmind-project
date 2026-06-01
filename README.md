@@ -313,7 +313,8 @@ pip install -r requirements.txt
 ```
 ## Environment Setup (.env)
 
-📁  Create .env file
+```bash
+Create .env file
 ---
 
 ## Apply Database Migrations

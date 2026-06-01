@@ -33,10 +33,9 @@ class LoginView(generics.GenericAPIView):
 
         return Response({
             "token": token.key,
-            "user": {
-                "username": user.username,
-                "email": user.email,
-            }
+            "fullname": user.username,
+            "email": user.email,
+            "user_id": user.id,
         })
 
 

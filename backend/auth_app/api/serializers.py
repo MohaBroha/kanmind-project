@@ -98,7 +98,7 @@ class TaskSerializer(serializers.ModelSerializer):
     reviewer_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
 
     def validate_status(self, value):
-        allowed_statuses = ["to-do", "in-progress", "review", "done"]
+        allowed_statuses = ["todo", "doing", "done"]
         if value not in allowed_statuses:
             raise serializers.ValidationError(
                 f"Invalid status: {value}. Must be one of {allowed_statuses}"
@@ -150,19 +150,8 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = [
-            "id",
-            "title",
-            "description",
-            "status",
-            "priority",
-            "board",
-            "assignee_id",
-            "reviewer_id",
-            "due_date",
-            "created_at",
-        ]
-        read_only_fields = ["id", "created_at"]
+        fields = "__all__"
+        read_only_fields = ["id", "created_at", "owner"]
 
 
 class BoardListSerializer(serializers.ModelSerializer):

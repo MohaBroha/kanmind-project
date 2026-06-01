@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from auth_app.models import Board, Task
+from auth_app.models import Board, Task, Comment
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -152,6 +152,19 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = "__all__"
         read_only_fields = ["id", "created_at", "owner"]
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = ["id", "created_at", "author", "content"]
+        read_only_fields = ["id", "created_at", "author"]
+
+    def get_author(self, obj):
+        name = obj.author.get_full_name().strip()
+        return name if name else obj.author.username
 
 
 class BoardListSerializer(serializers.ModelSerializer):

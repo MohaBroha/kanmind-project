@@ -7,6 +7,8 @@ from .views import (
     BoardDetailView,
     TaskView,
     TaskDetailView,
+    CommentListCreateView,
+    CommentDetailView,
 )
 
 
@@ -21,4 +23,6 @@ urlpatterns = [
     
     path("tasks/", TaskView.as_view()),
     path("tasks/<int:pk>/", TaskDetailView.as_view()),
+    path("tasks/<int:task_id>/comments/", CommentListCreateView.as_view()),
+    path("tasks/<int:task_id>/comments/<int:comment_id>/", CommentDetailView.as_view()),
 ]

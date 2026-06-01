@@ -206,6 +206,17 @@ class TaskDetailView(APIView):
     def get_object(self, pk, user):
         return Task.objects.get(id=pk, board__owner=user)
 
+    def get(self, request, pk):
+        try:
+            task = self.get_object(pk, request.user)
+            serializer = TaskSerializer(task)
+            return Response(serializer.data)
+        except Task.DoesNotExist:
+            return Response(
+                {"error": "Task not found"},
+                status=404
+            )
+
     def patch(self, request, pk):
         try:
             task = self.get_object(pk, request.user)

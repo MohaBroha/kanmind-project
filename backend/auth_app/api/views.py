@@ -12,9 +12,10 @@ from .serializers import (
     LoginSerializer,
     BoardSerializer,
     BoardDetailSerializer,
-    TaskSerializer
+    TaskSerializer,
+    CommentSerializer,
 )
-from ..models import Board, Task
+from ..models import Board, Task, Comment
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -241,3 +242,66 @@ class TaskDetailView(APIView):
                 {"error": "Task not found"},
                 status=404
             )
+
+
+class CommentListCreateView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_task(self, task_id, user):
+        return Task.objects.get(id=task_id, board__owner=user)
+
+    def get(self, request, task_id):
+        try:
+            task = self.get_task(task_id, request.user)
+        except Task.DoesNotExist:
+            return Response(
+                {"error": "Task not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        comments = task.comments.all().order_by("created_at")
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, task_id):
+        try:
+            task = self.get_task(task_id, request.user)
+        except Task.DoesNotExist:
+            return Response(
+                {"error": "Task not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = CommentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        comment = serializer.save(task=task, author=request.user)
+
+        return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+
+
+class CommentDetailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, task_id, comment_id):
+        try:
+            comment = Comment.objects.get(
+                id=comment_id,
+                task__id=task_id,
+                task__board__owner=request.user
+            )
+        except Comment.DoesNotExist:
+            return Response(
+                {"error": "Comment not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if comment.author != request.user and comment.task.board.owner != request.user:
+            return Response(
+                {"error": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

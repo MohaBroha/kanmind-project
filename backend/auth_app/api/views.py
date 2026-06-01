@@ -56,9 +56,18 @@ class BoardView(generics.ListCreateAPIView):
     serializer_class = BoardSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
 
+    def get_queryset(self):
+        return Board.objects.filter(
+            Q(owner=self.request.user) |
+            Q(members=self.request.user)
+        ).distinct()
+
+    def perform_create(self, serializer):
+        board = serializer.save(owner=self.request.user)
+        board.members.add(self.request.user)
+
+        
 
 class BoardDetailView(APIView):
 

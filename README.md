@@ -315,8 +315,7 @@ pip install -r requirements.txt
 
 ```bash
 Create .env file
----
-
+```
 ## Apply Database Migrations
 
 ```bash

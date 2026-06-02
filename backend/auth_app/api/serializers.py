@@ -117,8 +117,34 @@ class BoardSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
 
+    assignee = UserSerializer(read_only=True)
+    reviewer = UserSerializer(read_only=True)
+
     assignee_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
     reviewer_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+
+    comments_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "title",
+            "description",
+            "status",
+            "priority",
+            "assignee",
+            "reviewer",
+            "due_date",
+            "created_at",
+            "comments_count",
+            "assignee_id",
+            "reviewer_id",
+        ]
+        read_only_fields = ["id", "created_at", "owner"]
+
+    def get_comments_count(self, obj):
+        return obj.comments.count() if hasattr(obj, "comments") else 0
 
     def validate_status(self, value):
         allowed_statuses = ["todo", "doing", "done"]
@@ -130,24 +156,21 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         board = attrs.get("board")
-        assignee_id = attrs.pop("assignee_id", None) if not self.instance else self.initial_data.get("assignee_id")
-        reviewer_id = attrs.pop("reviewer_id", None) if not self.instance else self.initial_data.get("reviewer_id")
+
+        assignee_id = attrs.get("assignee_id")
+        reviewer_id = attrs.get("reviewer_id")
 
         if board:
             board_obj = board if isinstance(board, Board) else Board.objects.get(id=board)
             member_ids = list(board_obj.members.values_list("id", flat=True)) + [board_obj.owner.id]
 
             if assignee_id is not None:
-                assignee_id = int(assignee_id)
-                if assignee_id not in member_ids:
+                if int(assignee_id) not in member_ids:
                     raise serializers.ValidationError({"assignee_id": "Assignee must be a board member"})
-                attrs["assignee_id"] = assignee_id
 
             if reviewer_id is not None:
-                reviewer_id = int(reviewer_id)
-                if reviewer_id not in member_ids:
+                if int(reviewer_id) not in member_ids:
                     raise serializers.ValidationError({"reviewer_id": "Reviewer must be a board member"})
-                attrs["reviewer_id"] = reviewer_id
 
         return attrs
 
@@ -155,26 +178,30 @@ class TaskSerializer(serializers.ModelSerializer):
         assignee_id = validated_data.pop("assignee_id", None)
         reviewer_id = validated_data.pop("reviewer_id", None)
 
-        if assignee_id is not None:
-            validated_data["assignee_id"] = assignee_id
-        if reviewer_id is not None:
-            validated_data["reviewer_id"] = reviewer_id
+        task = super().create(validated_data)
 
-        return super().create(validated_data)
+        if assignee_id:
+             task.assignee_id = assignee_id
+        if reviewer_id:
+             task.reviewer_id = reviewer_id
+
+        task.save()
+        return task
+
 
     def update(self, instance, validated_data):
         assignee_id = validated_data.pop("assignee_id", None)
         reviewer_id = validated_data.pop("reviewer_id", None)
-        if assignee_id is not None:
-            validated_data["assignee_id"] = assignee_id
-        if reviewer_id is not None:
-            validated_data["reviewer_id"] = reviewer_id
-        return super().update(instance, validated_data)
 
-    class Meta:
-        model = Task
-        fields = "__all__"
-        read_only_fields = ["id", "created_at", "owner"]
+        task = super().update(instance, validated_data)
+
+        if assignee_id is not None:
+             task.assignee_id = assignee_id
+        if reviewer_id is not None:
+             task.reviewer_id = reviewer_id
+
+        task.save()
+        return task
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -216,7 +243,7 @@ class BoardListSerializer(serializers.ModelSerializer):
         return Task.objects.filter(board=obj).count()
 
     def get_tasks_to_do_count(self, obj):
-        return Task.objects.filter(board=obj, status="to-do").count()
+        return Task.objects.filter(board=obj, status="todo").count()
 
     def get_tasks_high_prio_count(self, obj):
         return Task.objects.filter(board=obj, priority="high").count()

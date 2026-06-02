@@ -75,22 +75,26 @@ class BoardDetailView(APIView):
 
     def get_object(self, pk, user):
         try:
-            return Board.objects.get(
-                Q(id=pk) & (Q(owner=user) | Q(members=user))
-            )
+            board = Board.objects.get(id=pk)
         except Board.DoesNotExist:
             return None
+
+        if board.owner != user and user not in board.members.all():
+            return "FORBIDDEN"
+
+        return board
 
     
     def get(self, request, pk):
 
         board = self.get_object(pk, request.user)
 
-        if not board:
-            return Response(
-                {"error": "Board not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        if board is None:
+          return Response({"error": "Board not found"}, status=404)
+
+        if board == "FORBIDDEN":
+           return Response({"error": "Forbidden"}, status=403)
+
 
         serializer = BoardDetailSerializer(board)
         return Response(serializer.data, status=status.HTTP_200_OK)

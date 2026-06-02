@@ -149,6 +149,11 @@ class BoardDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        if board == "FORBIDDEN":
+            return Response(
+                {"error": "Forbidden"},
+                status=status.HTTP_403_FORBIDDEN
+          )
         
         if board.owner != request.user:
             return Response(

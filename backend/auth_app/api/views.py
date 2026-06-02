@@ -257,6 +257,18 @@ class TaskDetailView(APIView):
             )
 
 
+class AssignedToMeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        tasks = Task.objects.filter(assignee=user)
+
+        serializer = TaskSerializer(tasks, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class CommentListCreateView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

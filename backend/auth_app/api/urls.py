@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    AssignedToMeView,
     RegisterView,
     LoginView,
     MeView,
@@ -21,6 +22,8 @@ urlpatterns = [
     path("boards/", BoardView.as_view()),
     path("boards/<int:pk>/", BoardDetailView.as_view()),
     
+    path("tasks/assigned-to-me/",AssignedToMeView.as_view()),
+
     path("tasks/", TaskView.as_view()),
     path("tasks/<int:pk>/", TaskDetailView.as_view()),
     path("tasks/<int:task_id>/comments/", CommentListCreateView.as_view()),

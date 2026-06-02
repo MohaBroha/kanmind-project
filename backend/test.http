@@ -1,2 +1,7 @@
-GET http://127.0.0.1:8000/api/boards/19/
+PATCH http://127.0.0.1:8000/api/boards/19/
 Authorization: Token 1c0592fda15acf1e04832418a0bd6f5ea9e2d628
+Content-Type: application/json
+
+{
+  "title": "Member Patch OK"
+}

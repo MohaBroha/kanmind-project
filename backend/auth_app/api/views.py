@@ -79,7 +79,7 @@ class BoardDetailView(APIView):
         except Board.DoesNotExist:
             return None
 
-        if board.owner != user and user not in board.members.all():
+        if board.owner != user and not board.members.filter(id=user.id).exists():
             return "FORBIDDEN"
 
         return board
@@ -104,26 +104,23 @@ class BoardDetailView(APIView):
 
         board = self.get_object(pk, request.user)
 
-        if not board:
+        if board is None:
             return Response(
                 {"error": "Board not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        
-        if request.user != board.owner:
+        if board == "FORBIDDEN":
             return Response(
-                {"error": "Only owner can update board"},
+                {"error": "Forbidden"},
                 status=status.HTTP_403_FORBIDDEN
             )
 
         data = request.data
 
-        
         if "title" in data:
             board.title = data["title"]
 
-        
         if "members" in data:
             member_ids = data["members"]
 
@@ -138,27 +135,15 @@ class BoardDetailView(APIView):
             board.members.set(users)
 
         board.save()
-
-        return Response({
-            "id": board.id,
-            "title": board.title,
-            "owner_id": board.owner.id,
-            "members": [
-                {
-                    "id": u.id,
-                    "email": u.email,
-                    "username": u.username
-                }
-                for u in board.members.all()
-            ]
-        }, status=status.HTTP_200_OK)
+        serializer = BoardDetailSerializer(board)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     
     def delete(self, request, pk):
 
         board = self.get_object(pk, request.user)
 
-        if not board:
+        if board is None:
             return Response(
                 {"error": "Board not found"},
                 status=status.HTTP_404_NOT_FOUND

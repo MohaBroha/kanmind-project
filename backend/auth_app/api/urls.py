@@ -23,6 +23,8 @@ urlpatterns = [
     path("boards/<int:pk>/", BoardDetailView.as_view()),
     
     path("tasks/assigned-to-me/",AssignedToMeView.as_view()),
+    path("tasks/reviewing/", AssignedToMeView.as_view()),
+
 
     path("tasks/", TaskView.as_view()),
     path("tasks/<int:pk>/", TaskDetailView.as_view()),

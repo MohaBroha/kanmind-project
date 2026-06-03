@@ -183,16 +183,27 @@ class TaskView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        board_id = request.data.get("board")
+
+        try:
+            board = Board.objects.get(id=board_id)
+        except Board.DoesNotExist:
+            return Response(
+                {"error": "Board not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+        if not Board.objects.filter(id=board_id, members=request.user).exists() and \
+           not Board.objects.filter(id=board_id, owner=request.user).exists():
+            return Response(
+               {"error": "Forbidden"},
+               status=status.HTTP_403_FORBIDDEN
+           )
+        
         serializer = TaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        board_id = request.data.get("board")
-
-        if not Board.objects.filter(id=board_id, owner=request.user).exists():
-            return Response(
-                {"error": "Invalid board"},
-                status=status.HTTP_403_FORBIDDEN
-            )
 
         task = serializer.save(owner=request.user)
 

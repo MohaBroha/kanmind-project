@@ -22,10 +22,11 @@ class Board(models.Model):
 class Task(models.Model):
 
     STATUS_CHOICES = [
-        ("todo", "Todo"),
-        ("doing", "Doing"),
-        ("done", "Done"),
-    ]
+    ("to-do", "To Do"),
+    ("in-progress", "In Progress"),
+    ("review", "Review"),
+    ("done", "Done"),
+]
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -33,7 +34,7 @@ class Task(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default="todo"
+        default="to-do"
     )
 
     priority = models.CharField(

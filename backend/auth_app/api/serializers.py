@@ -129,6 +129,7 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = [
             "id",
+            "board",
             "title",
             "description",
             "status",
@@ -147,11 +148,12 @@ class TaskSerializer(serializers.ModelSerializer):
         return obj.comments.count() if hasattr(obj, "comments") else 0
 
     def validate_status(self, value):
-        allowed_statuses = ["todo", "doing", "done"]
+        allowed_statuses = ["to-do", "in-progress", "review", "done"]
+
         if value not in allowed_statuses:
-            raise serializers.ValidationError(
+             raise serializers.ValidationError(
                 f"Invalid status: {value}. Must be one of {allowed_statuses}"
-            )
+        )
         return value
 
     def validate(self, attrs):

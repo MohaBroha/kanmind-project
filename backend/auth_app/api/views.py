@@ -265,7 +265,6 @@ class TaskDetailView(APIView):
             task.delete()
 
             return Response(
-                {"message": "Task deleted"},
                 status=204
             )
 
@@ -293,7 +292,7 @@ class CommentListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_task(self, task_id, user):
-        return Task.objects.get(id=task_id, board__owner=user)
+        return Task.objects.get(id=task_id, board__members=user)
 
     def get(self, request, task_id):
         try:
@@ -333,7 +332,7 @@ class CommentDetailView(APIView):
             comment = Comment.objects.get(
                 id=comment_id,
                 task__id=task_id,
-                task__board__owner=request.user
+                task__board__members=request.user
             )
         except Comment.DoesNotExist:
             return Response(

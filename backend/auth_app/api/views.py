@@ -6,6 +6,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.views import APIView
 from django.db.models import Q
 from django.contrib.auth.models import User
+from ..models import Board, Task, Comment
+
 
 from .serializers import (
     RegisterSerializer,
@@ -15,7 +17,6 @@ from .serializers import (
     TaskSerializer,
     CommentSerializer,
 )
-from ..models import Board, Task, Comment
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -173,7 +174,11 @@ class TaskView(APIView):
 
         status_param = request.query_params.get("status")
 
-        tasks = Task.objects.filter(board__owner=request.user)
+        tasks = Task.objects.filter(
+            Q(board__owner=request.user) |
+            Q(board__members=request.user)
+        ).distinct()
+
 
         if status_param:
             tasks = tasks.filter(status=status_param)
@@ -217,7 +222,10 @@ class TaskDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self, pk, user):
-        return Task.objects.get(id=pk, board__owner=user)
+        return Task.objects.get(
+            id=pk,
+            board__members=user
+       )
 
     def get(self, request, pk):
         try:

@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (
     AssignedToMeView,
+    EmailCheckView,
     RegisterView,
     LoginView,
     MeView,
@@ -24,7 +25,7 @@ urlpatterns = [
     
     path("tasks/assigned-to-me/",AssignedToMeView.as_view()),
     path("tasks/reviewing/", AssignedToMeView.as_view()),
-
+    path("email-check/", EmailCheckView.as_view()),
 
     path("tasks/", TaskView.as_view()),
     path("tasks/<int:pk>/", TaskDetailView.as_view()),

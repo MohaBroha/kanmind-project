@@ -34,7 +34,7 @@ class LoginView(generics.GenericAPIView):
 
         return Response({
             "token": token.key,
-            "fullname": user.username,
+            "fullname": user.username.replace("_", " "),
             "email": user.email,
             "user_id": user.id,
         })
@@ -47,7 +47,7 @@ class MeView(APIView):
     def get(self, request):
         return Response({
             "id": request.user.id,
-            "username": request.user.username,
+            "fullname": request.user.username.replace("_", " "),
             "email": request.user.email
         })
 
@@ -287,6 +287,29 @@ class AssignedToMeView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+
+class EmailCheckView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        email = request.query_params.get("email")
+
+        if not email:
+            return Response({"error": "email required"}, status=400)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "not found"}, status=404)
+
+        return Response({
+            "id": user.id,
+            "email": user.email,
+            "fullname": user.username.replace("_", " ")
+        })
+    
+    
 class CommentListCreateView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

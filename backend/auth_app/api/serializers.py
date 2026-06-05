@@ -71,7 +71,7 @@ class LoginSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
 
-    fullname = serializers.CharField(source="username")
+    fullname = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -81,6 +81,8 @@ class UserSerializer(serializers.ModelSerializer):
             "fullname",
         ]
 
+    def get_fullname(self, obj):
+        return obj.username.replace("_", " ")
 
 class BoardSerializer(serializers.ModelSerializer):
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
@@ -252,8 +254,8 @@ class BoardListSerializer(serializers.ModelSerializer):
 
 
 class BoardDetailSerializer(serializers.ModelSerializer):
-    owner_data = UserSerializer(source="owner", read_only=True)
-    members_data = UserSerializer(source="members", many=True, read_only=True)
+    owner_id = serializers.IntegerField(source="owner.id", read_only=True)
+    members = UserSerializer(many=True, read_only=True)
     tasks = TaskSerializer(many=True, read_only=True)
 
 
@@ -262,8 +264,8 @@ class BoardDetailSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
-            "owner_data",
-            "members_data",
+            "owner_id",
+            "members",
             "tasks",
         ]
 

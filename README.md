@@ -267,18 +267,10 @@ git clone https://github.com/YOUR_USERNAME/KanMind-Project.git
 
 ---
 
-## Navigate Into Project
-
-```bash
-cd KanMind-Project
-```
-
----
-
 ## Navigate Into Backend
 
 ```bash
-cd backend
+cd KanMind-Project/backend
 ```
 
 ---
@@ -287,7 +279,7 @@ cd backend
 
 ### Windows
 ```bash
-python -m venv env
+python -m venv .venv
 ```
 
 ---
@@ -296,12 +288,7 @@ python -m venv env
 
 ### Windows PowerShell
 ```powershell
-./env/scripts/activate
-```
-
-### Windows CMD
-```cmd
-env\Scripts\activate
+.\.venv\Scripts\Activate.ps1
 ```
 
 ---
@@ -311,10 +298,12 @@ env\Scripts\activate
 ```bash
 pip install -r requirements.txt
 ```
-## Environment Setup (.env)
+## Create file: backend/.env
 
 ```bash
-Create .env file
+SECRET_KEY=your-secret
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
 ```
 ## Apply Database Migrations
 

@@ -3,24 +3,18 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Environment variables
 .env
 
-# Virtual Environment
 env/
 venv/
 
-# Database
 db.sqlite3
 
-# Django
 *.log
 local_settings.py
 
-# IDE
 .vscode/
 .idea/
 
-# OS
 .DS_Store
 Thumbs.db

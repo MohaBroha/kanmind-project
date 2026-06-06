@@ -1,0 +1,14 @@
+POST http://127.0.0.1:8000/api/tasks/
+Authorization: Token a1957848d537a40640094d992771813effbf333e
+Content-Type: application/json
+
+{
+  "board": 16,
+  "title": "Code-Review durchführen",
+  "description": "Den neuen PR für das Feature X überprüfen",
+  "status": "review",
+  "priority": "medium",
+  "assignee_id": 25,
+  "reviewer_id": 25,
+  "due_date": "2025-02-27"
+}

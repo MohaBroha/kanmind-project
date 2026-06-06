@@ -4,6 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+<<<<<<< HEAD
 SECRET_KEY = config("SECRET_KEY", default="dev-secret-key")
 
 DEBUG = config("DEBUG", default=True, cast=bool)
@@ -13,6 +14,11 @@ ALLOWED_HOSTS = config(
     default="127.0.0.1,localhost",
     cast=lambda v: [s.strip() for s in v.split(",")]
 )
+=======
+SECRET_KEY = config("SECRET_KEY")
+DEBUG = config("DEBUG", default="1", cast=bool)
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
+>>>>>>> cd5b92e788d16856c4159c33c5c8a06f940db8d6
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -88,6 +94,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 STATIC_URL = 'static/'
 
@@ -101,3 +109,4 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ]
 }
+

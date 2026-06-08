@@ -15,6 +15,7 @@ from .serializers import (
     LoginSerializer,
     BoardSerializer,
     BoardDetailSerializer,
+    BoardPatchSerializer,
     TaskSerializer,
     CommentSerializer,
 )
@@ -132,7 +133,7 @@ class BoardDetailView(APIView):
             board.members.set(users)
 
         board.save()
-        serializer = BoardDetailSerializer(board)
+        serializer = BoardPatchSerializer(board)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):

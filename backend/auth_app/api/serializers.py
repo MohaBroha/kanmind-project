@@ -5,12 +5,23 @@ from auth_app.models import Board, Task, Comment
 
 
 class RegisterSerializer(serializers.Serializer):
+    """
+    Handles user registration including validation, user creation,
+    and token generation.
+    """
+
     fullname = serializers.CharField(write_only=True)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
     repeated_password = serializers.CharField(write_only=True, required=True)
 
     def validate(self, attrs):
+        """
+        Validates registration data:
+        - Ensures username is not manually provided
+        - Ensures both passwords match
+        """
+
         if "username" in self.initial_data:
             raise serializers.ValidationError(
                 {"username": "Field 'username' is not allowed. Use 'fullname' instead."}
@@ -19,7 +30,23 @@ class RegisterSerializer(serializers.Serializer):
             raise serializers.ValidationError("Passwords do not match")
         return attrs
 
+    def validate_email(self, value):
+        """
+        Ensures email is unique in the system.
+        """
+
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already exists")
+        return value
+
     def create(self, validated_data):
+        """
+        Creates a new user:
+        - Converts fullname into username format
+        - Ensures username uniqueness
+        - Creates auth token
+        """
+
         validated_data.pop("repeated_password")
         fullname = validated_data.pop("fullname")
         username = fullname.replace(" ", "_").strip() or "user"
@@ -42,6 +69,10 @@ class RegisterSerializer(serializers.Serializer):
         return user
 
     def to_representation(self, instance):
+        """
+        Formats API response after registration.
+        """
+
         return {
             "token": instance._generated_token,
             "fullname": instance._generated_fullname,
@@ -51,10 +82,22 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
+    """
+    Handles user login by validating email and password.
+    Returns authenticated user instance on success.
+    """
+
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
+        """
+        Validates login credentials:
+        - Checks if user exists by email
+        - Authenticates user using Django auth system
+        - Attaches user instance to validated data
+        """
+
         email = attrs.get("email")
         password = attrs.get("password")
 
@@ -73,6 +116,10 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializes basic user information for API responses.
+    Converts internal username format into a readable fullname.
+    """
 
     fullname = serializers.SerializerMethodField()
 
@@ -85,10 +132,19 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     def get_fullname(self, obj):
+        """
+        Returns a display-friendly fullname by replacing underscores
+        in the username with spaces.
+        """
+
         return obj.username.replace("_", " ")
 
 
 class BoardSerializer(serializers.ModelSerializer):
+    """
+    Serializes board overview data including statistics for dashboard display.
+    """
+
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
 
     member_count = serializers.SerializerMethodField()
@@ -109,19 +165,39 @@ class BoardSerializer(serializers.ModelSerializer):
         ]
 
     def get_member_count(self, obj):
+        """
+        Returns number of users who are members of the board.
+        """
+
         return obj.members.count()
 
     def get_ticket_count(self, obj):
+        """
+        Returns total number of tasks assigned to this board.
+        """
+
         return obj.tasks.count()
 
     def get_tasks_to_do_count(self, obj):
+        """
+        Returns number of tasks with status 'todo'.
+        """
+
         return obj.tasks.filter(status="todo").count()
 
     def get_tasks_high_prio_count(self, obj):
+        """
+        Returns number of tasks with priority 'high'.
+        """
+
         return obj.tasks.filter(priority="high").count()
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    """
+    Serializes task data including assignment, reviewer,
+    validation rules, and comment statistics.
+    """
 
     assignee = UserSerializer(read_only=True)
     reviewer = UserSerializer(read_only=True)
@@ -155,9 +231,17 @@ class TaskSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at", "owner"]
 
     def get_comments_count(self, obj):
+        """
+        Returns number of comments linked to this task.
+        """
+
         return obj.comments.count() if hasattr(obj, "comments") else 0
 
     def validate_status(self, value):
+        """
+        Ensures task status is within allowed workflow states.
+        """
+
         allowed_statuses = ["to-do", "in-progress", "review", "done"]
 
         if value not in allowed_statuses:
@@ -167,6 +251,10 @@ class TaskSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        """
+        Ensures assignee and reviewer are members of the board.
+        """
+
         board = attrs.get("board")
 
         assignee_id = attrs.get("assignee_id")
@@ -195,6 +283,10 @@ class TaskSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        """
+        Creates a task and assigns optional assignee and reviewer.
+        """
+
         assignee_id = validated_data.pop("assignee_id", None)
         reviewer_id = validated_data.pop("reviewer_id", None)
 
@@ -209,6 +301,10 @@ class TaskSerializer(serializers.ModelSerializer):
         return task
 
     def update(self, instance, validated_data):
+        """
+        Updates task and handles assignee/reviewer changes.
+        """
+
         assignee_id = validated_data.pop("assignee_id", None)
         reviewer_id = validated_data.pop("reviewer_id", None)
 
@@ -224,6 +320,11 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """
+    Serializes comment data including formatted author name
+    and creation timestamp for task discussions.
+    """
+
     author = serializers.SerializerMethodField()
 
     class Meta:
@@ -232,10 +333,20 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at", "author"]
 
     def get_author(self, obj):
+        """
+        Returns formatted author name by converting username
+        from internal format (underscore) to display format (spaces).
+        """
+
         return obj.author.username.replace("_", " ")
 
 
 class BoardListSerializer(serializers.ModelSerializer):
+    """
+    Serializes board overview for list view including
+    aggregated statistics such as members and task counts.
+    """
+
     member_count = serializers.SerializerMethodField()
     ticket_count = serializers.SerializerMethodField()
     tasks_to_do_count = serializers.SerializerMethodField()
@@ -255,19 +366,47 @@ class BoardListSerializer(serializers.ModelSerializer):
         ]
 
     def get_member_count(self, obj):
+        """
+        Returns number of members assigned to the board.
+        """
+
         return obj.members.count() if hasattr(obj, "members") else 0
 
     def get_ticket_count(self, obj):
+        """
+        Returns total number of tasks linked to this board.
+        """
+
         return Task.objects.filter(board=obj).count()
 
     def get_tasks_to_do_count(self, obj):
+        """
+        Returns number of tasks currently in 'todo' state.
+        """
+
         return Task.objects.filter(board=obj, status="todo").count()
 
     def get_tasks_high_prio_count(self, obj):
+        """
+        Returns number of high priority tasks in this board.
+        """
+
         return Task.objects.filter(board=obj, priority="high").count()
 
 
 class BoardDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for detailed board representation.
+
+    Provides full board information including:
+    - board id and title
+    - owner id
+    - list of members (nested UserSerializer)
+    - list of tasks (nested TaskSerializer)
+
+    Used for detailed board view (GET /boards/{id}).
+    """
+
     owner_id = serializers.IntegerField(source="owner.id", read_only=True)
     members = UserSerializer(many=True, read_only=True)
     tasks = TaskSerializer(many=True, read_only=True)
@@ -284,6 +423,18 @@ class BoardDetailSerializer(serializers.ModelSerializer):
 
 
 class BoardPatchSerializer(serializers.ModelSerializer):
+    """
+    Serializer for partial updates of a board.
+
+    Used for PATCH requests to update board fields such as title.
+
+    Provides read-only representation of:
+    - owner data
+    - members data
+
+    Does not allow direct modification of nested owner or members.
+    """
+
     owner_data = UserSerializer(source="owner", read_only=True)
     members_data = UserSerializer(source="members", many=True, read_only=True)
 

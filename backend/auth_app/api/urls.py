@@ -4,19 +4,20 @@ from .views import (
     EmailCheckView,
     RegisterView,
     LoginView,
-    MeView,
+    UserView,
     BoardView,
     BoardDetailView,
     TaskView,
     TaskDetailView,
     CommentListCreateView,
     CommentDetailView,
+    UserView,
 )
 
 urlpatterns = [
     path("registration/", RegisterView.as_view()),
     path("login/", LoginView.as_view()),
-    path("me/", MeView.as_view()),
+    path("user/", UserView.as_view()),
     path("boards/", BoardView.as_view()),
     path("boards/<int:pk>/", BoardDetailView.as_view()),
     path("tasks/assigned-to-me/", AssignedToMeView.as_view()),

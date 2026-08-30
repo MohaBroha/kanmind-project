@@ -1,5 +1,13 @@
-KanMind 🧠
+## 🛠️ Tech Stack
 
+### Backend
+
+![Python](https://img.shields.io/badge/Python_3.14-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django_6-092E20?style=for-the-badge&logo=django&logoColor=white)
+![Django REST Framework](https://img.shields.io/badge/Django_REST_Framework-A30000?style=for-the-badge)
+![Token Authentication](https://img.shields.io/badge/Token_Authentication-6A5ACD?style=for-the-badge)
+
+KanMind 🧠
 ### KanMind is a Django REST API backend for a Kanban-style productivity application.
 
 
